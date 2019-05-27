@@ -26,5 +26,4 @@ func TestPackMetadata(t *testing.T) {
 	if outGoingMD["authorization"][0] != "sup3rS3cr37" {
 		t.Fatalf("Unexpected bearer token %s", outGoingMD["Authorization"])
 	}
-
 }
