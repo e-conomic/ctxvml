@@ -53,7 +53,7 @@ func (ss serverStreamWithContext) Context() context.Context {
 func extractMetadataToContext(ctx context.Context) context.Context {
 	md, _ := metadata.FromIncomingContext(ctx)
 	headers := VmlHeaders{}
-	if mdValue, ok := md["vml-username"]; ok {
+	if mdValue, ok := md["x-ssn-username"]; ok {
 		headers.Username = mdValue[0]
 		grpc_ctxtags.Extract(ctx).Set("username", mdValue[0])
 		ctx = context.WithValue(ctx, ctxMarkerKey, headers)
@@ -91,7 +91,7 @@ func StreamClientInterceptor() grpc.StreamClientInterceptor {
 func packCallerMetadata(ctx context.Context) map[string]string {
 	var md = map[string]string{}
 	headers := Extract(ctx)
-	md["vml-username"] = headers.Username
+	md["x-ssn-username"] = headers.Username
 	return md
 }
 
