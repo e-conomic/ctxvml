@@ -10,8 +10,8 @@ import (
 
 type ctxMarker struct{}
 
-// SsnHeaders contains x-ssn http headers.
-type SsnHeaders struct {
+// VmlHeaders contains vml http headers.
+type VmlHeaders struct {
 	Username string
 }
 
@@ -52,8 +52,8 @@ func (ss serverStreamWithContext) Context() context.Context {
 // finds caller information in the gRPC metadata and adds it to the context
 func extractMetadataToContext(ctx context.Context) context.Context {
 	md, _ := metadata.FromIncomingContext(ctx)
-	headers := SsnHeaders{}
-	if mdValue, ok := md["x-ssn-username"]; ok {
+	headers := VmlHeaders{}
+	if mdValue, ok := md["vml-username"]; ok {
 		headers.Username = mdValue[0]
 		grpc_ctxtags.Extract(ctx).Set("username", mdValue[0])
 		ctx = context.WithValue(ctx, ctxMarkerKey, headers)
@@ -91,20 +91,20 @@ func StreamClientInterceptor() grpc.StreamClientInterceptor {
 func packCallerMetadata(ctx context.Context) map[string]string {
 	var md = map[string]string{}
 	headers := Extract(ctx)
-	md["x-ssn-username"] = headers.Username
+	md["vml-username"] = headers.Username
 	return md
 }
 
 // Extract extracts metadate from the context.
-func Extract(ctx context.Context) *SsnHeaders {
-	headers, ok := ctx.Value(ctxMarkerKey).(SsnHeaders)
+func Extract(ctx context.Context) *VmlHeaders {
+	headers, ok := ctx.Value(ctxMarkerKey).(VmlHeaders)
 	if !ok {
-		return &SsnHeaders{}
+		return &VmlHeaders{}
 	}
 	return &headers
 }
 
-// WithValue Creates context with SSN header values
-func WithValue(ctx context.Context, headers SsnHeaders) context.Context {
+// WithValue Creates context with VML header values
+func WithValue(ctx context.Context, headers VmlHeaders) context.Context {
 	return context.WithValue(ctx, ctxMarkerKey, headers)
 }
