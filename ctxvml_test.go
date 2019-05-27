@@ -12,7 +12,7 @@ func TestPackMetadata(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 	ctx = metadata.AppendToOutgoingContext(ctx, "Authorization", "sup3rS3cr37")
-	ctx = WithValue(ctx, SsnHeaders{
+	ctx = WithValue(ctx, VmlHeaders{
 		Username: "JohnDoe",
 	})
 	md := packCallerMetadata(ctx)
