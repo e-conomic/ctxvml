@@ -18,7 +18,7 @@ type VmlHeaders struct {
 }
 
 func (h VmlHeaders) OcrCacheAllow() bool {
-	return strings.ToLower(h.OcrCache) == "allow"
+	return strings.EqualFold(h.OcrCache, "allow")
 }
 
 var (
