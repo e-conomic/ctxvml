@@ -2,6 +2,7 @@ package ctxvml
 
 import (
 	"context"
+	"strings"
 
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	"google.golang.org/grpc"
@@ -13,6 +14,11 @@ type ctxMarker struct{}
 // VmlHeaders contains vml http headers.
 type VmlHeaders struct {
 	Username string
+	OcrCache string
+}
+
+func (h VmlHeaders) OcrCacheAllow() bool {
+	return strings.EqualFold(h.OcrCache, "allow")
 }
 
 var (
@@ -53,11 +59,16 @@ func (ss serverStreamWithContext) Context() context.Context {
 func extractMetadataToContext(ctx context.Context) context.Context {
 	md, _ := metadata.FromIncomingContext(ctx)
 	headers := VmlHeaders{}
-	if mdValue, ok := md["vml-username"]; ok {
+	if mdValue, ok := md["vml-username"]; ok && len(mdValue) != 0 {
 		headers.Username = mdValue[0]
-		grpc_ctxtags.Extract(ctx).Set("username", mdValue[0])
-		ctx = context.WithValue(ctx, ctxMarkerKey, headers)
 	}
+	if mdValue, ok := md["vml-ocr-cache"]; ok && len(mdValue) != 0 {
+		headers.OcrCache = mdValue[0]
+	}
+	if headers.Username != "" {
+		grpc_ctxtags.Extract(ctx).Set("username", headers.Username)
+	}
+	ctx = context.WithValue(ctx, ctxMarkerKey, headers)
 	return ctx
 }
 
@@ -92,6 +103,7 @@ func packCallerMetadata(ctx context.Context) map[string]string {
 	var md = map[string]string{}
 	headers := Extract(ctx)
 	md["vml-username"] = headers.Username
+	md["vml-ocr-cache"] = headers.OcrCache
 	return md
 }
 
