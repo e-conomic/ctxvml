@@ -13,8 +13,9 @@ type ctxMarker struct{}
 
 // VmlHeaders contains vml http headers.
 type VmlHeaders struct {
-	Username string
-	OcrCache string
+	Username   string
+	OcrCache   string
+	AuthMethod string
 }
 
 func (h VmlHeaders) OcrCacheAllow() bool {
@@ -65,6 +66,9 @@ func extractMetadataToContext(ctx context.Context) context.Context {
 	if mdValue, ok := md["vml-ocr-cache"]; ok && len(mdValue) != 0 {
 		headers.OcrCache = mdValue[0]
 	}
+	if mdValue, ok := md["vml-auth-method"]; ok && len(mdValue) != 0 {
+		headers.AuthMethod = mdValue[0]
+	}
 	if headers.Username != "" {
 		grpc_ctxtags.Extract(ctx).Set("username", headers.Username)
 	}
@@ -104,6 +108,7 @@ func packCallerMetadata(ctx context.Context) map[string]string {
 	headers := Extract(ctx)
 	md["vml-username"] = headers.Username
 	md["vml-ocr-cache"] = headers.OcrCache
+	md["vml-auth-method"] = headers.AuthMethod
 	return md
 }
 
