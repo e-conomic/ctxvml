@@ -16,8 +16,8 @@ func TestPackMetadata(t *testing.T) {
 		Username: "JohnDoe",
 	})
 	md := packCallerMetadata(ctx)
-	if md["x-ssn-username"] != "JohnDoe" {
-		t.Fatalf("Unexpected username %s", md["x-ssn-username"])
+	if md["vml-username"] != "JohnDoe" {
+		t.Fatalf("Unexpected username %s", md["vml-username"])
 	}
 	for k, v := range md {
 		ctx = metadata.AppendToOutgoingContext(ctx, k, v)
